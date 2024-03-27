@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+
+  nginx:
+    image: nginx
+    container_name: nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www
+      - ./nginx/conf.d/:/etc/nginx/conf.d/
+    depends_on:
+      - app
+      - mysql
+
+  mysql:
+   image : mysql
+   container_name : mysql
+   volumes:
+     - database:/var/lib/mysql
+   ports:
+     - "3306:3306"
+   environment:
+     - "MYSQL_ROOT_PASSWORD=secret"
+     - "MYSQL_PASSWORD=secret"
+     - "MYSQL_DATABASE=test-task"
+
+  app:
+    container_name: test-task
+    build: 
+      context: ./php
+      dockerfile: Dockerfile
+    volumes:
+      - ./src:/var/www
+    ports:
+      - "9000:9000"
+    working_dir: /var/www
+
+  phpmyadmin:
+   image: phpmyadmin/phpmyadmin
+   container_name: phpmyadmin
+   environment:
+     - "PMA_HOST=mysql"
+     - "PMA_USER=root"
+     - "PMA_PASSWORD=secret"
+     - "UPLOAD_LIMIT=64M"
+   ports:
+     - "3400:80"
+   depends_on:
+     - mysql
+
+  node:
+    image: node:18-alpine
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./:/var/www
+    working_dir: /var/www
+    tty: true
+
+
+volumes:
+  database:
