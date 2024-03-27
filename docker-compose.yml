@@ -28,8 +28,7 @@ services:
 
   app:
     container_name: test-task
-    build: 
-      context: ./php
+    build:
       dockerfile: Dockerfile
     volumes:
       - ./src:/var/www
